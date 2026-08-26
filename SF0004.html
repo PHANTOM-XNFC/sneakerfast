@@ -22,13 +22,15 @@
       <a class="header-link" href="index.html">INÍCIO</a>
     </div>
   </header>
+
   <main class="wrap product-page">
     <div class="product-layout">
       <div class="gallery">
         <figure class="photo-frame">
-          <img id="mainPhoto" src="assets/images/SF0004/01.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll SKU SF0004">
+          <img id="mainPhoto" src="assets/images/SF0004/01.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll Roxo SKU SF0004">
         </figure>
-        <div class="gallery-thumbs"><button class="gallery-thumb is-active" type="button" data-full="assets/images/SF0004/01.jpg"><img src="assets/images/SF0004/01.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
+        <div class="gallery-thumbs">
+          <button class="gallery-thumb is-active" type="button" data-full="assets/images/SF0004/01.jpg"><img src="assets/images/SF0004/01.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
           <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/02.jpg"><img src="assets/images/SF0004/02.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
           <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/03.jpg"><img src="assets/images/SF0004/03.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
           <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/04.jpg"><img src="assets/images/SF0004/04.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
@@ -45,33 +47,49 @@
           <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/15.jpg"><img src="assets/images/SF0004/15.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
           <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/16.jpg"><img src="assets/images/SF0004/16.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
           <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/17.jpg"><img src="assets/images/SF0004/17.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
-          <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/18.jpg"><img src="assets/images/SF0004/18.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button></div>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0004/18.jpg"><img src="assets/images/SF0004/18.jpg" alt="Nike Air Jordan 1 Mid Voodoo Doll"></button>
+        </div>
       </div>
+
       <section class="product-copy">
         <div class="sku">SKU SF0004</div>
         <h1>Nike Air Jordan 1 Mid Voodoo Doll</h1>
         <span class="badge">Roxo</span>
+
         <div class="price-row">
-          <div class="price"><small>PREÇO ATACADO</small><strong>R$229,00</strong></div>
-          <div class="price"><small>PREÇO VAREJO</small><strong>R$359,00</strong></div>
+          <div class="price">
+            <small>PREÇO ATACADO</small>
+            <strong>R$229,00</strong>
+          </div>
+          <div class="price">
+            <small>PREÇO VAREJO</small>
+            <strong>R$359,00</strong>
+          </div>
         </div>
+
         <ul class="meta-list">
           <li><span>SKU</span><strong>SF0004</strong></li>
           <li><span>Grade</span><strong>34/44</strong></li>
           <li><span>Tamanhos</span><strong>34 35 36 37 38 39 40 41 42 43 44</strong></li>
           <li><span>Cores</span><strong>Roxo</strong></li>
         </ul>
+
         <p class="desc">Nike Air Jordan 1 Mid Voodoo Doll disponível na grade 34/44. Consulte disponibilidade de cores e numerações.</p>
+
         <div class="commerce">
           <p>Pedido mínimo: R$499</p>
           <p>Frete grátis em compras acima de R$1.000</p>
         </div>
+
         <button class="btn btn-primary" type="button" data-whatsapp>COMPRAR PELO WHATSAPP</button>
-        <p class="whatsapp-note" data-whatsapp-note>WhatsApp será configurado em breve.</p>
       </section>
     </div>
   </main>
-  <footer class="site-footer"><div class="wrap">SNEAKERFAST • ATACADO</div></footer>
+
+  <footer class="site-footer">
+    <div class="wrap">SNEAKERFAST • ATACADO</div>
+  </footer>
+
   <script src="assets/js/app.js"></script>
   <script>
     (function () {
@@ -81,7 +99,9 @@
           var src = btn.getAttribute("data-full");
           if (main && src) {
             main.src = src;
-            document.querySelectorAll(".gallery-thumb").forEach(function (b) { b.classList.remove("is-active"); });
+            document.querySelectorAll(".gallery-thumb").forEach(function (b) {
+              b.classList.remove("is-active");
+            });
             btn.classList.add("is-active");
           }
         });
