@@ -1,0 +1,17 @@
+.DS_Store
+Thumbs.db
+*.log
+app.log
+.env
+.env.*
+.venv/
+venv/
+data/
+*.db
+*.sqlite
+*.sqlite3
+catalog.db
+settings.json
+*.py
+*.pyc
+__pycache__/
