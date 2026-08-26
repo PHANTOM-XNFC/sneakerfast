@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nike Alphafly 3 | SneakerFast</title>
-  <meta name="description" content="Nike Alphafly 3 SKU SF0001. Grade 38/43. Atacado R$149,00. Diversas cores disponíveis. Pedido mínimo R$499. Frete grátis acima de R$1.000.">
+  <meta name="description" content="Tênis Nike Alphafly 3, linha performance/running, disponível em diversas cores e grade 38 ao 43. Consulte disponibilidade de cores e numerações. Importado de Altíssima qualidade.">
   <meta property="og:title" content="Nike Alphafly 3 | SneakerFast">
-  <meta property="og:description" content="Nike Alphafly 3 disponível em diversas cores. Grade 38 ao 43. Atacado R$149,00. Consulte disponibilidade.">
+  <meta property="og:description" content="Tênis Nike Alphafly 3, linha performance/running, disponível em diversas cores e grade 38 ao 43. Consulte disponibilidade de cores e numerações. Importado de Altíssima qualidade.">
   <meta property="og:type" content="product">
-  <meta property="og:image" content="assets/images/SF0001.jpg">
+  <meta property="og:image" content="assets/images/SF0001/01.jpg">
   <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -25,14 +25,29 @@
 
   <main class="wrap product-page">
     <div class="product-layout">
-      <figure class="photo-frame">
-        <img src="assets/images/SF0001.jpg" alt="Nike Alphafly 3 SKU SF0001">
-      </figure>
+      <div class="gallery">
+        <figure class="photo-frame">
+          <img id="mainPhoto" src="assets/images/SF0001/01.jpg" alt="Nike Alphafly 3 Várias SKU SF0001">
+        </figure>
+        <div class="gallery-thumbs">
+          <button class="gallery-thumb is-active" type="button" data-full="assets/images/SF0001/01.jpg"><img src="assets/images/SF0001/01.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/02.jpg"><img src="assets/images/SF0001/02.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/03.jpg"><img src="assets/images/SF0001/03.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/04.jpg"><img src="assets/images/SF0001/04.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/05.jpg"><img src="assets/images/SF0001/05.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/06.jpg"><img src="assets/images/SF0001/06.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/07.jpg"><img src="assets/images/SF0001/07.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/08.jpg"><img src="assets/images/SF0001/08.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/09.jpg"><img src="assets/images/SF0001/09.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/10.jpg"><img src="assets/images/SF0001/10.jpg" alt="Nike Alphafly 3"></button>
+          <button class="gallery-thumb" type="button" data-full="assets/images/SF0001/11.jpg"><img src="assets/images/SF0001/11.jpg" alt="Nike Alphafly 3"></button>
+        </div>
+      </div>
 
       <section class="product-copy">
         <div class="sku">SKU SF0001</div>
         <h1>Nike Alphafly 3</h1>
-        <span class="badge">Diversas cores disponíveis</span>
+        <span class="badge">Várias</span>
 
         <div class="price-row">
           <div class="price">
@@ -48,10 +63,11 @@
         <ul class="meta-list">
           <li><span>SKU</span><strong>SF0001</strong></li>
           <li><span>Grade</span><strong>38/43</strong></li>
-          <li><span>Cores</span><strong>Diversas cores disponíveis</strong></li>
+          <li><span>Tamanhos</span><strong>38 39 40 41 42 43</strong></li>
+          <li><span>Cores</span><strong>Várias</strong></li>
         </ul>
 
-        <p class="desc">Nike Alphafly 3 disponível em diversas cores. Grade 38 ao 43. Consulte disponibilidade de cores e numerações.</p>
+        <p class="desc">Tênis Nike Alphafly 3, linha performance/running, disponível em diversas cores e grade 38 ao 43. Consulte disponibilidade de cores e numerações. Importado de Altíssima qualidade.</p>
 
         <div class="commerce">
           <p>Pedido mínimo: R$499</p>
@@ -69,5 +85,22 @@
   </footer>
 
   <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var main = document.getElementById("mainPhoto");
+      document.querySelectorAll(".gallery-thumb").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var src = btn.getAttribute("data-full");
+          if (main && src) {
+            main.src = src;
+            document.querySelectorAll(".gallery-thumb").forEach(function (b) {
+              b.classList.remove("is-active");
+            });
+            btn.classList.add("is-active");
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
