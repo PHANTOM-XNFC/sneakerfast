@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo | SneakerFast Atacado</title>
+  <meta name="description" content="Catálogo atacado SneakerFast. Filtre, busque e monte seu pedido pelo WhatsApp.">
+  <link rel="canonical" href="https://sneakersfast.com.br/catalogo.html">
+  <meta property="og:title" content="Catálogo | SneakerFast Atacado">
+  <meta property="og:description" content="Catálogo atacado SneakerFast. Filtre, busque e monte seu pedido pelo WhatsApp.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sneakersfast.com.br/catalogo.html">
+  <meta property="og:image" content="https://sneakersfast.com.br/assets/images/SF0001/01.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="assets/brand/favicon.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="catalog" data-whatsapp-url="https://wa.me/message/TUP6PJHVHAJYM1" data-meta-pixel-id="">
+
+  <header class="site-header">
+    <div class="promo-bar">
+    <div class="container promo-inner">
+      <span>PEDIDO MÍNIMO R$499</span><span class="dot">•</span>
+      <span>FRETE GRÁTIS ACIMA DE R$1.000</span><span class="dot">•</span>
+      <span>ENVIO PARA TODO O BRASIL</span><span class="dot">•</span>
+      <span>ATENDIMENTO WHATSAPP</span>
+    </div>
+  </div>
+    <div class="container header-row">
+      <a class="brand" href="index.html"><img class="brand-logo brand-logo--header" src="assets/brand/logo_sneakerfast_header.webp" srcset="assets/brand/logo_sneakerfast_header.webp 1x, assets/brand/logo_sneakerfast_header@3x.webp 3x" alt="SneakerFast" decoding="async" fetchpriority="high"></a>
+      <nav class="desktop-nav" aria-label="Principal"><a href="index.html" class="desktop-nav-link">INÍCIO</a>
+<a href="catalogo.html" class="desktop-nav-link is-active">CATÁLOGO</a>
+<a href="catalogo.html#lancamentos" class="desktop-nav-link">LANÇAMENTOS</a>
+<a href="catalogo.html#marcas" class="desktop-nav-link">MARCAS</a>
+<a href="catalogo.html#categorias" class="desktop-nav-link">CATEGORIAS</a>
+<a href="index.html#como-funciona" class="desktop-nav-link">COMO FUNCIONA</a>
+<a href="index.html#faq" class="desktop-nav-link">FAQ</a></nav>
+      <div class="header-actions">
+        <button class="icon-btn" type="button" id="headerSearchBtn" aria-label="Buscar">⌕</button>
+        <button class="icon-btn mobile-only" type="button" id="menuBtn" aria-label="Menu">☰</button>
+        <button class="icon-btn whatsapp-icon" type="button" data-whatsapp aria-label="WhatsApp">WA</button>
+      </div>
+    </div>
+    <div class="header-search" id="headerSearch" hidden>
+      <div class="container">
+        <input type="search" id="quickSearch" placeholder="Buscar SKU, marca, modelo..." autocomplete="off">
+      </div>
+    </div>
+  </header>
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+  <aside class="mobile-drawer" id="mobileNav" hidden aria-label="Menu mobile">
+    <div class="mobile-drawer-head">
+      <strong>MENU</strong>
+      <button type="button" class="icon-btn" id="closeMobileNav" aria-label="Fechar">×</button>
+    </div>
+    <nav class="mobile-drawer-nav"><a href="index.html" class="">Início</a>
+<a href="catalogo.html" class="is-active">Catálogo</a>
+<a href="catalogo.html#lancamentos" class="">Lançamentos</a>
+<a href="catalogo.html#marcas" class="">Marcas</a>
+<a href="catalogo.html#categorias" class="">Categorias</a>
+<a href="index.html#como-funciona" class="">Como Funciona</a>
+<a href="index.html#faq" class="">Faq</a></nav>
+  </aside>
+  <main class="container catalog-page">
+    <div class="catalog-toolbar">
+      <input type="search" id="catalogSearch" placeholder="Buscar SKU, marca, modelo..." autocomplete="off">
+      <button class="btn btn-ghost btn-filter" type="button" id="openFilterDrawer">FILTRAR</button>
+      <select id="catalogSort" aria-label="Ordenar">
+        <option value="recent">Mais recentes</option>
+        <option value="price_asc">Menor preço</option>
+        <option value="price_desc">Maior preço</option>
+        <option value="az">A-Z</option>
+      </select>
+    </div>
+    <p class="results-meta" id="resultsMeta"></p>
+    <div class="product-grid cols-2" id="catalogGrid"></div>
+    <p class="empty-state" id="catalogEmpty" hidden>Nenhum produto encontrado.</p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <img class="brand-logo brand-logo--footer" src="assets/brand/logo_sneakerfast_footer.webp" srcset="assets/brand/logo_sneakerfast_footer.webp 1x, assets/brand/logo_sneakerfast_footer@3x.webp 3x" alt="SneakerFast" decoding="async" loading="lazy">
+      <span>Tênis importados no atacado • Envio para todo o Brasil</span>
+      <button class="btn btn-primary btn-sm" type="button" data-whatsapp>FALAR NO WHATSAPP</button>
+    </div>
+  </footer>
+
+  <div class="order-bar" id="orderBar">
+    <button type="button" class="order-bar-btn" id="orderBarBtn">
+      PEDIDO • <span id="orderCount">0</span> MODELOS
+    </button>
+  </div>
+  <div class="order-overlay" id="orderOverlay" hidden></div>
+  <div class="order-panel" id="orderPanel" hidden>
+    <div class="order-panel-head">
+      <strong>Seu pedido atacado</strong>
+      <button type="button" class="icon-btn" id="closeOrderPanel" aria-label="Fechar">×</button>
+    </div>
+    <div class="order-panel-body" id="orderItems"></div>
+    <div class="order-panel-foot">
+      <button class="btn btn-primary" type="button" id="sendOrderWhatsApp">ENVIAR PEDIDO NO WHATSAPP</button>
+    </div>
+  </div>
+
+  <div class="filter-overlay" id="filterOverlay" hidden></div>
+  <div class="filter-drawer" id="filterDrawer" hidden>
+    <div class="filter-drawer-head">
+      <strong>Filtrar</strong>
+      <button type="button" class="icon-btn" id="closeFilterDrawer" aria-label="Fechar">×</button>
+    </div>
+    <div class="filter-drawer-body" id="filterForm"></div>
+    <div class="filter-drawer-foot">
+      <button class="btn btn-ghost" type="button" id="clearFilters">Limpar</button>
+      <button class="btn btn-primary" type="button" id="applyFilters">Aplicar</button>
+    </div>
+  </div>
+  <script src="assets/data/catalog.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
