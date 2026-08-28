@@ -6,7 +6,7 @@ app.log
 .env.*
 .venv/
 venv/
-data/
+/data/
 *.db
 *.sqlite
 *.sqlite3
