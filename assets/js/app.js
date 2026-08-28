@@ -8,10 +8,20 @@
     productsBySku[p.sku] = p;
   });
 
+  var OFFICIAL_WHATSAPP_URL = "https://wa.me/5511965403753";
   var body = document.body;
-  var whatsappUrl = body.getAttribute("data-whatsapp-url") || "";
   var pixelId = (body.getAttribute("data-meta-pixel-id") || "").replace(/\D/g, "");
   var page = body.getAttribute("data-page") || "home";
+
+  function buildWhatsAppUrl(message) {
+    if (!message) return OFFICIAL_WHATSAPP_URL;
+    return OFFICIAL_WHATSAPP_URL + "?text=" + encodeURIComponent(message);
+  }
+
+  function openWhatsApp(message) {
+    trackPixel("Contact");
+    window.location.href = buildWhatsAppUrl(message);
+  }
 
   function getOrder() {
     try {
@@ -37,16 +47,6 @@
   function trackCustom(eventName, params) {
     if (!pixelId || typeof window.fbq !== "function") return;
     window.fbq("trackCustom", eventName, params || {});
-  }
-
-  function openWhatsApp(message) {
-    trackPixel("Contact");
-    var url = whatsappUrl;
-    if (message) {
-      var sep = url.indexOf("?") >= 0 ? "&" : "?";
-      url += sep + "text=" + encodeURIComponent(message);
-    }
-    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   function buildSingleMessage(sku) {
