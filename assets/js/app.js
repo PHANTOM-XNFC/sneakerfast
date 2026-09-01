@@ -431,6 +431,9 @@
           main.src = src;
           thumbs.forEach(function (b) { b.classList.remove("is-active"); });
           btn.classList.add("is-active");
+          if (typeof btn.scrollIntoView === "function") {
+            btn.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+          }
         }
       });
     });
