@@ -274,7 +274,7 @@
     }
     host.innerHTML =
       '<label>Marca<select id="filterBrand">' + options(uniqueValues("brand"), q.marca) + "</select></label>" +
-      '<label>Categoria<select id="filterCategory">' + options(catalog.categories || uniqueValues("category"), q.categoria) + "</select></label>" +
+      '<label>Categoria<select id="filterCategory">' + options(uniqueValues("category"), q.categoria) + "</select></label>" +
       '<label>Cor<select id="filterColor">' + options(uniqueValues("color"), "") + "</select></label>" +
       '<label>Grade<select id="filterGrade">' + options(uniqueValues("grade"), "") + "</select></label>" +
       '<label>Preço mínimo<input type="number" id="filterMinPrice" min="0" step="1"></label>' +
@@ -315,11 +315,11 @@
     if (!filters.category && parseQuery().categoria) filters.category = parseQuery().categoria;
 
     var list = catalog.products.filter(function (p) {
-      if (q && p.search.indexOf(q) === -1) return false;
+      if (q && (p.search || "").indexOf(q) === -1) return false;
       if (filters.brand && p.brand !== filters.brand) return false;
       if (filters.category && p.category !== filters.category) return false;
       if (filters.color && p.color !== filters.color) return false;
-      if (filters.grade && p.grade !== filters.grade) return false;
+      if (filters.grade && (p.grade || "") !== filters.grade) return false;
       if (filters.minPrice && (p.wholesale || 0) < filters.minPrice) return false;
       if (filters.maxPrice && (p.wholesale || 0) > filters.maxPrice) return false;
       return true;
