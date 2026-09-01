@@ -18,8 +18,21 @@
     return OFFICIAL_WHATSAPP_URL + "?text=" + encodeURIComponent(message);
   }
 
+  function trackContact(sku) {
+    if (typeof window.fbq !== "function") return;
+    var payload = { contact_method: "whatsapp" };
+    if (sku) {
+      var p = productsBySku[sku];
+      payload.content_ids = [sku];
+      payload.content_type = "product";
+      payload.content_name = p ? (p.model || "") : "";
+      payload.value = p && p.wholesale != null ? Number(p.wholesale) : 0;
+      payload.currency = "BRL";
+    }
+    window.fbq("track", "Contact", payload);
+  }
+
   function openWhatsApp(message) {
-    trackPixel("Contact");
     window.location.href = buildWhatsAppUrl(message);
   }
 
@@ -166,9 +179,11 @@
       button.addEventListener("click", function () {
         var sku = body.getAttribute("data-sku");
         if (sku && page === "product") {
+          trackContact(sku);
           openWhatsApp(buildSingleMessage(sku));
           return;
         }
+        trackContact();
         openWhatsApp("Olá! Gostaria de consultar produtos SneakerFast no atacado.");
       });
     });
