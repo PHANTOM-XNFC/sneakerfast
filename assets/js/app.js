@@ -69,6 +69,33 @@
     return lines.join("\n");
   }
 
+  var orderSendBound = false;
+
+  function orderWholesaleTotal(items) {
+    var total = 0;
+    items.forEach(function (sku) {
+      var p = productsBySku[sku];
+      if (p && p.wholesale != null) total += Number(p.wholesale);
+    });
+    return total;
+  }
+
+  function sendOrderToWhatsApp() {
+    var items = getOrder();
+    if (!items.length) return;
+    if (typeof window.fbq === "function") {
+      window.fbq("track", "InitiateCheckout", {
+        content_ids: items.slice(),
+        content_type: "product",
+        num_items: items.length,
+        value: orderWholesaleTotal(items),
+        currency: "BRL",
+      });
+    }
+    trackCustom("WholesaleOrder", { content_ids: items, num_items: items.length, currency: "BRL" });
+    openWhatsApp(buildOrderMessage(items));
+  }
+
   function addToOrder(sku) {
     var items = getOrder();
     if (items.indexOf(sku) !== -1) {
@@ -181,12 +208,10 @@
     });
 
     var sendBtn = document.getElementById("sendOrderWhatsApp");
-    if (sendBtn) {
+    if (sendBtn && !orderSendBound) {
+      orderSendBound = true;
       sendBtn.addEventListener("click", function () {
-        var items = getOrder();
-        if (!items.length) return;
-        trackCustom("WholesaleOrder", { content_ids: items, num_items: items.length, currency: "BRL" });
-        openWhatsApp(buildOrderMessage(items));
+        sendOrderToWhatsApp();
       });
     }
 
