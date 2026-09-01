@@ -71,17 +71,22 @@
 
   function addToOrder(sku) {
     var items = getOrder();
-    if (items.indexOf(sku) === -1) {
-      items.push(sku);
-      saveOrder(items);
+    if (items.indexOf(sku) !== -1) {
+      renderOrderPanel();
+      return;
     }
+    items.push(sku);
+    saveOrder(items);
     var p = productsBySku[sku];
-    trackPixel("AddToCart", {
-      content_ids: [sku],
-      content_type: "product",
-      value: p ? p.wholesale : 0,
-      currency: "BRL",
-    });
+    if (typeof window.fbq === "function") {
+      window.fbq("track", "AddToCart", {
+        content_ids: [sku],
+        content_type: "product",
+        content_name: p ? (p.model || "") : "",
+        value: p && p.wholesale != null ? Number(p.wholesale) : 0,
+        currency: "BRL",
+      });
+    }
     renderOrderPanel();
   }
 
