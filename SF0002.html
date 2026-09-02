@@ -146,14 +146,85 @@
     </div>
     <div class="order-panel-body" id="orderItems"></div>
     <div class="order-panel-foot">
-      <button class="btn btn-primary" type="button" id="sendOrderWhatsApp">ENVIAR PEDIDO NO WHATSAPP</button>
+      <button class="btn btn-primary" type="button" id="sendOrderWhatsApp">FINALIZAR / ENVIAR PEDIDO</button>
+    </div>
+  </div>
+  <div class="checkout-overlay" id="checkoutOverlay" hidden></div>
+  <div class="checkout-modal" id="checkoutModal" hidden>
+    <div class="checkout-modal-head">
+      <strong>FINALIZAR PEDIDO</strong>
+      <button type="button" class="icon-btn" id="closeCheckoutModal" aria-label="Fechar">×</button>
+    </div>
+    <div class="checkout-modal-body">
+      <div class="checkout-lines" id="checkoutLines"></div>
+      <div class="checkout-summary" id="checkoutSummary"></div>
+      <p class="checkout-min-warn" id="checkoutMinWarn" hidden>Pedido mínimo de R$499,00.
+Adicione mais produtos para finalizar.</p>
+      <form class="checkout-form" id="checkoutForm" novalidate>
+        <label class="checkout-field">NOME COMPLETO
+          <input id="checkoutName" name="name" type="text" autocomplete="name" required maxlength="120">
+        </label>
+        <fieldset class="checkout-fieldset">
+          <legend>TIPO DE CLIENTE</legend>
+          <label class="checkout-radio"><input type="radio" name="checkoutClientType" value="pf" required> Pessoa Física (CPF)</label>
+          <label class="checkout-radio"><input type="radio" name="checkoutClientType" value="pj"> Empresa (CNPJ)</label>
+        </fieldset>
+        <label class="checkout-field">CIDADE
+          <input id="checkoutCity" name="city" type="text" autocomplete="address-level2" required maxlength="80">
+        </label>
+        <label class="checkout-field">UF
+          <select id="checkoutUf" name="uf" required>
+            <option value="">Selecione</option>
+          <option value="AC">AC — Acre</option>
+          <option value="AL">AL — Alagoas</option>
+          <option value="AP">AP — Amapá</option>
+          <option value="AM">AM — Amazonas</option>
+          <option value="BA">BA — Bahia</option>
+          <option value="CE">CE — Ceará</option>
+          <option value="DF">DF — Distrito Federal</option>
+          <option value="ES">ES — Espírito Santo</option>
+          <option value="GO">GO — Goiás</option>
+          <option value="MA">MA — Maranhão</option>
+          <option value="MT">MT — Mato Grosso</option>
+          <option value="MS">MS — Mato Grosso do Sul</option>
+          <option value="MG">MG — Minas Gerais</option>
+          <option value="PA">PA — Pará</option>
+          <option value="PB">PB — Paraíba</option>
+          <option value="PR">PR — Paraná</option>
+          <option value="PE">PE — Pernambuco</option>
+          <option value="PI">PI — Piauí</option>
+          <option value="RJ">RJ — Rio de Janeiro</option>
+          <option value="RN">RN — Rio Grande do Norte</option>
+          <option value="RS">RS — Rio Grande do Sul</option>
+          <option value="RO">RO — Rondônia</option>
+          <option value="RR">RR — Roraima</option>
+          <option value="SC">SC — Santa Catarina</option>
+          <option value="SP">SP — São Paulo</option>
+          <option value="SE">SE — Sergipe</option>
+          <option value="TO">TO — Tocantins</option>
+          </select>
+        </label>
+        <label class="checkout-field">CEP
+          <input id="checkoutCep" name="cep" type="text" inputmode="numeric" autocomplete="postal-code" required maxlength="9" placeholder="00000-000">
+        </label>
+        <fieldset class="checkout-fieldset">
+          <legend>FORMA DE RECEBIMENTO</legend>
+          <label class="checkout-radio"><input type="radio" name="checkoutReceive" value="envio" required> Envio</label>
+          <label class="checkout-radio"><input type="radio" name="checkoutReceive" value="retirada"> Retirada no estoque</label>
+        </fieldset>
+        <p class="checkout-form-error" id="checkoutFormError" hidden></p>
+      </form>
+    </div>
+    <div class="checkout-modal-foot">
+      <button class="btn btn-primary" type="button" id="checkoutWhatsApp">CONTINUAR NO WHATSAPP</button>
+      <button class="btn btn-ghost" type="button" id="checkoutBack">VOLTAR AO PEDIDO</button>
     </div>
   </div>
   <div class="lightbox" id="lightbox" hidden>
     <button type="button" class="lightbox-close" id="closeLightbox" aria-label="Fechar">×</button>
     <img id="lightboxImg" alt="">
   </div>
-  <script src="assets/data/catalog.js?v=20260901230233"></script>
-  <script src="assets/js/app.js?v=20260901230233"></script>
+  <script src="assets/data/catalog.js?v=20260902011713"></script>
+  <script src="assets/js/app.js?v=20260902011713"></script>
 </body>
 </html>

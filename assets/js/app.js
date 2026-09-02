@@ -2,6 +2,9 @@
   "use strict";
 
   var STORAGE_KEY = "sneakerfast_order_v1";
+  var QTY_KEY = "sneakerfast_order_qty_v1";
+  var MIN_ORDER = 499;
+  var FREIGHT_FREE = 1000;
   var catalog = window.SNEAKERFAST_CATALOG || { products: [], launches: [] };
   var productsBySku = {};
   catalog.products.forEach(function (p) {
@@ -41,14 +44,63 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return [];
       var parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      var seen = {};
+      var out = [];
+      parsed.forEach(function (item) {
+        var sku = typeof item === "string" ? item : (item && item.sku);
+        if (!sku || seen[sku]) return;
+        seen[sku] = true;
+        out.push(sku);
+      });
+      return out;
     } catch (e) {
       return [];
     }
   }
 
+  function getQtyMap() {
+    try {
+      var parsed = JSON.parse(localStorage.getItem(QTY_KEY) || "{}");
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function pruneQtyMap(items) {
+    var map = getQtyMap();
+    Object.keys(map).forEach(function (sku) {
+      if (items.indexOf(sku) === -1) delete map[sku];
+    });
+    localStorage.setItem(QTY_KEY, JSON.stringify(map));
+    return map;
+  }
+
+  function getQty(sku) {
+    var n = parseInt(getQtyMap()[sku], 10);
+    return n >= 1 ? n : 1;
+  }
+
+  function setQty(sku, qty) {
+    var n = parseInt(qty, 10);
+    if (!isFinite(n) || n < 1) n = 1;
+    var map = pruneQtyMap(getOrder());
+    map[sku] = n;
+    localStorage.setItem(QTY_KEY, JSON.stringify(map));
+    return n;
+  }
+
   function saveOrder(items) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    var unique = [];
+    var seen = {};
+    (items || []).forEach(function (sku) {
+      if (!sku || seen[sku]) return;
+      seen[sku] = true;
+      unique.push(sku);
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(unique));
+    pruneQtyMap(unique);
     updateOrderBar();
   }
 
@@ -82,31 +134,225 @@
     return lines.join("\n");
   }
 
+  function formatBrl(value) {
+    var n = Number(value);
+    if (!isFinite(n)) n = 0;
+    var parts = n.toFixed(2).split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return "R$" + parts[0] + "," + parts[1];
+  }
+
+  function escHtml(value) {
+    return String(value || "").replace(/[&<>"']/g, function (ch) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
+    });
+  }
+
+  function getOrderLines() {
+    return getOrder().map(function (sku) {
+      var p = productsBySku[sku];
+      var qty = getQty(sku);
+      var unit = p && p.wholesale != null ? Number(p.wholesale) : 0;
+      return {
+        sku: sku,
+        product: p,
+        qty: qty,
+        unit: unit,
+        subtotal: unit * qty,
+        title: p ? (p.title || p.model || sku) : sku,
+      };
+    }).filter(function (line) { return line.product; });
+  }
+
   var orderSendBound = false;
+  var checkoutUiBound = false;
+  var initiateCheckoutFired = false;
 
   function orderWholesaleTotal(items) {
     var total = 0;
-    items.forEach(function (sku) {
+    (items || getOrder()).forEach(function (sku) {
       var p = productsBySku[sku];
-      if (p && p.wholesale != null) total += Number(p.wholesale);
+      var qty = getQty(sku);
+      if (p && p.wholesale != null) total += Number(p.wholesale) * qty;
     });
     return total;
   }
 
-  function sendOrderToWhatsApp() {
+  function freightLabel(total) {
+    return total >= FREIGHT_FREE ? "GRÁTIS ✅" : "A CALCULAR";
+  }
+
+  function maskCep(value) {
+    var digits = String(value || "").replace(/\D/g, "").slice(0, 8);
+    if (digits.length <= 5) return digits;
+    return digits.slice(0, 5) + "-" + digits.slice(5);
+  }
+
+  function selectedRadio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : "";
+  }
+
+  function trackInitiateCheckout(items) {
+    if (initiateCheckoutFired || !items.length || typeof window.fbq !== "function") return;
+    initiateCheckoutFired = true;
+    window.fbq("track", "InitiateCheckout", {
+      content_ids: items.slice(),
+      content_type: "product",
+      num_items: items.reduce(function (sum, sku) { return sum + getQty(sku); }, 0),
+      value: orderWholesaleTotal(items),
+      currency: "BRL",
+    });
+  }
+
+  function renderCheckout() {
+    var host = document.getElementById("checkoutLines");
+    var summary = document.getElementById("checkoutSummary");
+    var warn = document.getElementById("checkoutMinWarn");
+    var sendBtn = document.getElementById("checkoutWhatsApp");
+    if (!host || !summary) return;
+    var lines = getOrderLines();
+    var total = 0;
+    host.innerHTML = lines.map(function (line) {
+      total += line.subtotal;
+      return (
+        '<div class="checkout-line">' +
+          '<img src="' + line.product.cover + '" alt="">' +
+          '<div class="checkout-line-copy">' +
+            "<strong>" + escHtml(line.sku) + "</strong>" +
+            "<span>" + escHtml(line.title) + "</span>" +
+            '<div class="checkout-line-meta">Unitário ' + formatBrl(line.unit) + " • Subtotal " + formatBrl(line.subtotal) + "</div>" +
+            '<div class="checkout-qty">' +
+              '<button type="button" data-qty-minus="' + escHtml(line.sku) + '" aria-label="Diminuir">−</button>' +
+              '<input type="number" min="1" step="1" inputmode="numeric" data-qty-input="' + escHtml(line.sku) + '" value="' + line.qty + '">' +
+              '<button type="button" data-qty-plus="' + escHtml(line.sku) + '" aria-label="Aumentar">+</button>' +
+            "</div>" +
+          "</div>" +
+        "</div>"
+      );
+    }).join("");
+    summary.innerHTML =
+      "<div>TOTAL PARCIAL: <strong>" + formatBrl(total) + "</strong></div>" +
+      "<div>FRETE: <strong>" + freightLabel(total) + "</strong></div>";
+    var belowMin = total < MIN_ORDER;
+    if (warn) warn.hidden = !belowMin;
+    if (sendBtn) {
+      sendBtn.disabled = belowMin || !lines.length;
+      sendBtn.setAttribute("aria-disabled", belowMin || !lines.length ? "true" : "false");
+    }
+  }
+
+  function buildCheckoutMessage() {
+    var lines = getOrderLines();
+    var total = 0;
+    var blocks = [
+      "Olá! Vim pelo site da SneakerFast e gostaria de finalizar este pedido:",
+      "",
+      "🛍️ PEDIDO SELECIONADO",
+      "",
+    ];
+    lines.forEach(function (line) {
+      total += line.subtotal;
+      blocks.push(line.qty + "x " + line.sku + " — " + line.title);
+      blocks.push(formatBrl(line.unit) + " cada | " + formatBrl(line.subtotal));
+      blocks.push("");
+    });
+    var typeValue = selectedRadio("checkoutClientType");
+    var typeLabel = typeValue === "pj" ? "Empresa (CNPJ)" : "Pessoa Física (CPF)";
+    var receiveValue = selectedRadio("checkoutReceive");
+    var receiveLabel = receiveValue === "retirada" ? "Retirada no estoque" : "Envio";
+    var name = (document.getElementById("checkoutName") || {}).value || "";
+    var city = (document.getElementById("checkoutCity") || {}).value || "";
+    var uf = (document.getElementById("checkoutUf") || {}).value || "";
+    var cep = (document.getElementById("checkoutCep") || {}).value || "";
+    blocks.push("━━━━━━━━━━━━━━");
+    blocks.push("TOTAL PARCIAL: " + formatBrl(total));
+    blocks.push("FRETE: " + freightLabel(total));
+    blocks.push("━━━━━━━━━━━━━━");
+    blocks.push("");
+    blocks.push("👤 DADOS DO CLIENTE");
+    blocks.push("");
+    blocks.push("Nome: " + name.trim());
+    blocks.push("Tipo: " + typeLabel);
+    blocks.push("Cidade/UF: " + city.trim() + "/" + uf);
+    blocks.push("CEP: " + cep.trim());
+    blocks.push("Recebimento: " + receiveLabel);
+    blocks.push("");
+    blocks.push("🌐 Pedido realizado em:");
+    blocks.push("https://sneakersfast.com.br/");
+    blocks.push("");
+    blocks.push("Gostaria de confirmar disponibilidade, prazo de envio e pagamento.");
+    return blocks.join("\n");
+  }
+
+  function validateCheckoutForm() {
+    var error = document.getElementById("checkoutFormError");
+    function fail(msg) {
+      if (error) {
+        error.hidden = false;
+        error.textContent = msg;
+      }
+      return false;
+    }
+    if (error) {
+      error.hidden = true;
+      error.textContent = "";
+    }
+    var name = ((document.getElementById("checkoutName") || {}).value || "").trim();
+    var city = ((document.getElementById("checkoutCity") || {}).value || "").trim();
+    var uf = ((document.getElementById("checkoutUf") || {}).value || "").trim();
+    var cep = maskCep((document.getElementById("checkoutCep") || {}).value || "");
+    if (!name) return fail("Informe o nome completo.");
+    if (!selectedRadio("checkoutClientType")) return fail("Selecione o tipo de cliente.");
+    if (!city) return fail("Informe a cidade.");
+    if (!uf) return fail("Selecione a UF.");
+    if (!/^\d{5}-\d{3}$/.test(cep)) return fail("Informe um CEP válido (00000-000).");
+    if (!selectedRadio("checkoutReceive")) return fail("Selecione a forma de recebimento.");
+    return true;
+  }
+
+  function openCheckoutModal() {
     var items = getOrder();
     if (!items.length) return;
-    if (typeof window.fbq === "function") {
-      window.fbq("track", "InitiateCheckout", {
-        content_ids: items.slice(),
-        content_type: "product",
-        num_items: items.length,
-        value: orderWholesaleTotal(items),
-        currency: "BRL",
-      });
+    var panel = document.getElementById("orderPanel");
+    var overlay = document.getElementById("orderOverlay");
+    var modal = document.getElementById("checkoutModal");
+    var checkoutOverlay = document.getElementById("checkoutOverlay");
+    closePanel(panel, overlay);
+    renderCheckout();
+    trackInitiateCheckout(items);
+    if (modal) modal.hidden = false;
+    if (checkoutOverlay) checkoutOverlay.hidden = false;
+    var first = document.getElementById("checkoutName");
+    if (first) setTimeout(function () { first.focus(); }, 50);
+  }
+
+  function closeCheckoutModal(backToOrder) {
+    var modal = document.getElementById("checkoutModal");
+    var checkoutOverlay = document.getElementById("checkoutOverlay");
+    if (modal) modal.hidden = true;
+    if (checkoutOverlay) checkoutOverlay.hidden = true;
+    if (backToOrder) {
+      renderOrderPanel();
+      openPanel(document.getElementById("orderPanel"), document.getElementById("orderOverlay"));
     }
-    trackCustom("WholesaleOrder", { content_ids: items, num_items: items.length, currency: "BRL" });
-    openWhatsApp(buildOrderMessage(items));
+  }
+
+  function continueCheckoutWhatsApp() {
+    var items = getOrder();
+    if (!items.length) return;
+    var total = orderWholesaleTotal(items);
+    if (total < MIN_ORDER) {
+      renderCheckout();
+      return;
+    }
+    if (!validateCheckoutForm()) return;
+    trackCustom("WholesaleOrder", { content_ids: items, num_items: items.reduce(function (sum, sku) { return sum + getQty(sku); }, 0), currency: "BRL" });
+    openWhatsApp(buildCheckoutMessage());
+  }
+
+  function sendOrderToWhatsApp() {
+    openCheckoutModal();
   }
 
   function addToOrder(sku) {
@@ -117,6 +363,7 @@
     }
     items.push(sku);
     saveOrder(items);
+    setQty(sku, 1);
     var p = productsBySku[sku];
     if (typeof window.fbq === "function") {
       window.fbq("track", "AddToCart", {
@@ -230,9 +477,71 @@
       });
     }
 
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closePanel(panel, overlay);
-    });
+    var checkoutBack = document.getElementById("checkoutBack");
+    var checkoutClose = document.getElementById("closeCheckoutModal");
+    var checkoutSend = document.getElementById("checkoutWhatsApp");
+    var checkoutOverlay = document.getElementById("checkoutOverlay");
+    var checkoutCep = document.getElementById("checkoutCep");
+    var checkoutBody = document.querySelector(".checkout-modal-body");
+
+    if (!checkoutUiBound) {
+      checkoutUiBound = true;
+      if (checkoutBack) checkoutBack.addEventListener("click", function () { closeCheckoutModal(true); });
+      if (checkoutClose) checkoutClose.addEventListener("click", function () { closeCheckoutModal(true); });
+      if (checkoutOverlay) checkoutOverlay.addEventListener("click", function () { closeCheckoutModal(true); });
+      if (checkoutSend) checkoutSend.addEventListener("click", continueCheckoutWhatsApp);
+      if (checkoutCep) {
+        checkoutCep.addEventListener("input", function () {
+          checkoutCep.value = maskCep(checkoutCep.value);
+        });
+      }
+
+      document.addEventListener("click", function (e) {
+        var target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        var minus = target.getAttribute("data-qty-minus");
+        var plus = target.getAttribute("data-qty-plus");
+        if (minus) {
+          setQty(minus, getQty(minus) - 1);
+          renderCheckout();
+        }
+        if (plus) {
+          setQty(plus, getQty(plus) + 1);
+          renderCheckout();
+        }
+      });
+      document.addEventListener("change", function (e) {
+        var target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        var sku = target.getAttribute("data-qty-input");
+        if (!sku) return;
+        setQty(sku, target.value);
+        renderCheckout();
+      });
+
+      if (window.visualViewport) {
+        var syncKeyboard = function () {
+          var inset = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+          document.documentElement.style.setProperty("--keyboard-inset", inset + "px");
+          var modal = document.getElementById("checkoutModal");
+          if (modal && !modal.hidden && document.activeElement && checkoutBody) {
+            document.activeElement.scrollIntoView({ block: "nearest", inline: "nearest" });
+          }
+        };
+        window.visualViewport.addEventListener("resize", syncKeyboard);
+        window.visualViewport.addEventListener("scroll", syncKeyboard);
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        var modal = document.getElementById("checkoutModal");
+        if (modal && !modal.hidden) {
+          closeCheckoutModal(true);
+          return;
+        }
+        closePanel(panel, overlay);
+      });
+    }
 
     updateOrderBar();
     renderOrderPanel();
